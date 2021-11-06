@@ -10,14 +10,35 @@ class CartItem extends React.Component {
             img: ''
         }
        // this.increaseQuantity = this.increaseQuantity.bind(this);
+       //  this.testing();
     }
+
+    // testing () {
+    //     const promise = new Promise((resolve, reject) => {
+    //         setTimeout(() => {
+    //             resolve('done');
+    //         }, 5000);
+    //     })
+
+    //     promise.then(() => {
+    //         //setState acts like a synchronus call
+    //         this.setState({qty: this.state.qty + 10});
+
+    //         this.setState({qty: this.state.qty + 10});
+
+    //         this.setState({qty: this.state.qty + 10});
+
+    //         console.log('state', this.state);
+    //     });
+    // }
     increaseQuantity = () => {
         //this.state.qty += 1;
         console.log('this', this.state);
         //setState form 1
         // this.setState({
         //         qty: this.state.qty + 1
-        //     });
+        //     }, () => {});   // optional call back to setState
+
         // setState form 2 - if prevState required use this
         this.setState( (prevState) => {
             return {
@@ -25,8 +46,24 @@ class CartItem extends React.Component {
             }
         });
     }
+
+    decreaseQuantity = () => {
+        const { qty } = this.state;
+
+        if(qty === 0) {
+            return;
+        }
+        // setState form 2 - if prevState required use this
+        this.setState( (prevState) => {
+            return {
+                qty: prevState.qty - 1   //shallow merging 
+            }
+        });
+    }
     render () {
         // obj destructuring
+        console.log('render');
+
         const { price, title, qty } = this.state;
         return (
             <div className="cart-item">
@@ -49,6 +86,7 @@ class CartItem extends React.Component {
                          alt="decrease" 
                          className="action-icons" 
                          src="https://cdn-icons-png.flaticon.com/128/992/992683.png"
+                         onClick={this.decreaseQuantity}
                        />
                        <img 
                          alt="delete" 
