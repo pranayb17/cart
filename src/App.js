@@ -3,6 +3,11 @@ import React from 'react';
 import Cart from './Cart';
 import Navbar from './Navbar';
 
+import firebase from "firebase/app";
+import firestore from "firebase";
+
+
+
 
 class App extends react.Component {
 
@@ -10,34 +15,90 @@ class App extends react.Component {
     super();
     this.state = {
       products: [
-        {
-          price: 99,
-          title: 'Watch',
-          qty: 1,
-          img: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8d3Jpc3R3YXRjaHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
-          id: 1
-        },
-        {
-          price: 999,
-          title: 'Mobile Phone',
-          qty: 10,
-          img: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=367&q=80',
-          id: 2
-        },
-        {
-          price: 999,
-          title: 'Laptop',
-          qty: 4,
-          img: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?ixid=MnwxMjA3fDB8MHxzZWFyY2h8N3x8bGFwdG9wfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-          id: 3
-        }
-      ]
+        // {
+        //   qty: 1,
+        //   price: 8999,
+        //   title: 'Mobile Phone',
+        //   img:'https://media.wired.com/photos/610050dc8eb98ab033ce45df/master/w_2400,h_1800,c_limit/Gear-Nokia-G20.jpg',
+        //   id:1
+        // },
+        // {
+        //   qty: 1,
+        //   price: 999,
+        //   title: 'Watch',
+        //   img:'https://staticimg.titan.co.in/Fastrack/Catalog/3072SL06_2.jpg?pView=pdp',
+        //   id:2
+        // },
+        // {
+        //   qty: 1,
+        //   price: 1499,
+        //   title: 'Bluetooth Speaker',
+        //   img:'https://www.bhphotovideo.com/images/images2500x2500/jbl_jblgo3bluam_go_3_portable_bluetooth_1583007.jpg',
+        //   id:3
+        // }
+      ],
+      loading : true
     }
-    // this.increaseQuantity = this.increaseQuantity.bind(this);
-    //  this.testing();
   }
+
+  componentDidMount() {
+    // firebase
+    //   .firestore()
+    //   .collection('products')
+    //   .get()
+      // .then((snapshot) => {
+      //   console.log(snapshot)
+
+
+      //   snapshot.docs.map((doc) => {
+      //     console.log(doc.data ());
+      //   });
+
+      //   const products = snapshot.docs.map((doc) => {
+      //     const data = doc.data();
+
+      //     data['id'] = doc.id;
+      //     return data;
+      //   });
+
+      //   this.setState({
+      //     products : products,
+      //     loading : false
+      //   })
+
+      // })
+
+
+    firebase
+      .firestore()
+      .collection('products')
+      .onSnapshot((snapshot) => {
+        console.log(snapshot)
+
+
+        snapshot.docs.map((doc) => {
+          console.log(doc.data ());
+        });
+
+        const products = snapshot.docs.map((doc) => {
+          const data = doc.data();
+
+          data['id'] = doc.id;
+          return data;
+        });
+
+        this.setState({
+          products : products,
+          loading : false
+        })
+
+  
+      })
+      
+
+  }
+
   handleIncreaseQuantity = (product) => {
-    console.log('Hey please inc the qty of', product);
     const { products } = this.state;
     const index = products.indexOf(product);
 
@@ -45,7 +106,7 @@ class App extends react.Component {
 
     this.setState({
       products
-    })
+    });
   }
   handleDncreaseQuantity = (product) => {
     console.log('Hey please inc the qty of', product);
@@ -60,6 +121,7 @@ class App extends react.Component {
 
     this.setState({
       products
+      
     })
   }
   handleDeleteProduct = (id) => {
@@ -77,9 +139,9 @@ class App extends react.Component {
 
     let count = 0;
 
-    products.forEach((product) =>{
+    products.forEach((product) => {
       count += product.qty;
-    } )
+    })
 
     return count;
   }
@@ -90,14 +152,17 @@ class App extends react.Component {
     let cartTotal = 0;
 
     products.map((product) => {
-      cartTotal = cartTotal + product.qty * product.price
-    })
+      if (product.qty > 0) {
+        cartTotal = cartTotal + product.qty * product.price
+      }
+      return '';
+    });
 
     return cartTotal;
   }
 
   render() {
-    const { products } = this.state;
+    const { products, loading } = this.state;
     return (
       <div className="App">
         <Navbar count={this.getCartCount()} />
@@ -107,7 +172,8 @@ class App extends react.Component {
           onDecreaseQuantity={this.handleDncreaseQuantity}
           onDeleteProduct={this.handleDeleteProduct}
         />
-        <div style={{padding: 10, fontSize: 20}}>TOTAL: { this.getCartTotal() }</div>
+        {loading && <h1>Loading Products...</h1>}
+        <div style={{ padding: 10, fontSize: 20 }}>TOTAL: {this.getCartTotal()}</div>
       </div>
     );
   }
